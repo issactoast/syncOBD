@@ -22,35 +22,37 @@ mobilesample1 <- mobile_data[[1]]
 max(sample1$speed) / max(mobilesample1$speed) 
 
 # Visual confirmation
-with(sample1, plot(timestamp, speed/3.570348, type = "l"))
+with(sample1, plot(timestamp, speed/3.6, type = "l"))
 with(mobilesample1, points(timestamp - timestamp[1]  + 270,
                            speed, col = "red",
                            type = "l"))
 
 
-y <- sample1$speed / 3.570348
+y <- sample1$speed / 3.6
 x <- mobilesample1$speed 
 plot(sample1$timestamp, y, type = "l")
 mobilesample1$timestamp[256] - mobilesample1$timestamp[1]
 
 points(1:length(x) + sample1$timestamp[256], x, type = "l", col = "red")
-
+i <- 256
 result <- rep(0, length(y))
 for (i in 1:length(y)){
     n2 <- min((i+(length(x)-1)), length(y))
     result[i] <- sqrt(sum((y[i:n2] - x[1:(n2-(i-1))])^2)) / (n2-(i-1))
+    # result[i] <- sqrt(mean((y[i:n2] - x[1:(n2-(i-1))])^2))
     # result[i] <- sum(abs(y[i:n2] - x[1:(n2-(i-1))])) / (n2-(i-1))
-
 }
 
-plot(1:length(result), result)
-start_time <- sample1$timestamp[which.min(result[1:600])] 
+plot(1:length(result), result, type = "l")
+start_time <- sample1$timestamp[which.min(result)] 
 
+# result checking
 plot(sample1$timestamp, y, type = "l")
-points(mobilesample1$timestamp - mobilesample1$timestamp[1] + start_time + 10,
-       x, col = "red", type = "l")
+points(sample1$timestamp[i:n2],
+       x[1:(n2-(i-1))], col = "red", type = "l")
 
-sample1$timestamp
+# smoothing
+
 
 # make one dataframe
 obd2_data <- Reduce(rbind, obd2_data)
