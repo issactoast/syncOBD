@@ -13,7 +13,7 @@ length(mobile_data)
 # 3.6 vs. 3.570348
 
 # obd2 unit m/s
-sample1 <- obd2_data[[1]]
+sample1 <- obd2_data[[35]]
 
 # mobile speed unit km/h
 mobilesample1 <- mobile_data[[1]]
@@ -44,14 +44,94 @@ for (i in 1:length(y)){
 }
 
 plot(1:length(result), result, type = "l")
-start_time <- sample1$timestamp[which.min(result)] 
+start_index <- which.min(result) 
 
 # result checking
 plot(sample1$timestamp, y, type = "l")
-points(sample1$timestamp[i:n2],
-       x[1:(n2-(i-1))], col = "red", type = "l")
+points(sample1$timestamp[start_index:n2],
+       x[1:(n2-(start_index-1))], col = "red", type = "l")
 
-# smoothing
+# make function
+sync_trip <- function(obd_trip_data, mobile_trip_data){
+    # load reference speed
+    # sync scale using division of 3.6
+    ref_speed <- obd_trip_data$speed / 3.6
+    
+    # load mobile speed vector
+    x <- mobile_trip_data$speed
+    
+    # measure length of the speed vector
+    n_ref <- length(ref_speed)
+    n_x <- length(x)
+    
+    # make result vector
+    result <- rep(0, n_ref)
+    n2_vec <- rep(0, n_ref)
+    
+    # sliding window from 1st element of reference speed vector
+    # to the last element of reference speed vector.
+    for (i in 1:n_ref){
+        # calculating the overlapped length
+        n2 <- min( (i+(n_x-1)), n_ref ) 
+        # (n2-(i-1)) data points used
+        result[i] <- sqrt(sum((ref_speed[i:n2] - x[1:(n2-(i-1))])^2)) / (n2-(i-1))
+        n2_vec[i] <- n2
+    }
+    
+    # find the arg min of i
+    min_i <- which.min(result)
+    
+    # return the result; min i & corresponding n2
+    list(start_index = min_i,
+         end_index = n2_vec[min_i],
+         fitness = result[min_i])
+}
+
+# mobile speed unit km/h
+mobilesample1 <- mobile_data[[9]]
+
+# find best OBD2 trip
+match_result <- lapply(obd2_data, sync_trip,
+                       mobile_trip_data = mobilesample1)
+match_result <- matrix(unlist(match_result), ncol = 3, byrow = TRUE)
+trip_fit <- match_result[,3]
+plot(1:length(trip_fit), trip_fit, type = "l")
+
+match_info <- c(match_result[which.min(trip_fit),],
+                which.min(trip_fit))
+match_result[15,]
+
+# make function 2: visualization
+vis_trip(obd2_data[[match_info[4]]], mobile_data[[9]], match_info)
+# ref_trip_data <- obd2_data[[15]]
+# trip_data <- mobile_data[[10]]
+# start_p <- match_info[1]
+# end_p <- match_info[2]
+
+vis_trip <- function(ref_trip_data, trip_data, match_info){
+    # grab information about the start and end points
+    start_p <- match_info[1]
+    end_p <- match_info[2]
+    # ref trip data, trip_data both have timestamp, speed
+    with(ref_trip_data,
+         plot(timestamp, speed/3.6, type = "l")
+    )
+    with(trip_data,
+         points(ref_trip_data$timestamp[start_p:end_p],
+                speed[1:(end_p-(start_p-1))],
+                col = "red", type = "l")
+    )
+}
+    
+# obd2 unit m/s
+obd2_sample1 <- obd2_data[[35]]
+myresult <- sync_trip(obd2_sample1, mobilesample1)
+
+# result checking
+plot(obd2_sample1$timestamp, obd2_sample1$speed/3.6, type = "l")
+points(obd2_sample1$timestamp[myresult$start_index:myresult$end_index],
+       x[1:(myresult$end_index-(myresult$start_index-1))], col = "red", type = "l")
+
 
 
 # make one dataframe
