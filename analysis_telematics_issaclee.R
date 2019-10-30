@@ -13,7 +13,7 @@ length(mobile_data)
 # 3.6 vs. 3.570348
 
 # obd2 unit m/s
-sample1 <- obd2_data[[35]]
+sample1 <- obd2_data[[1]]
 
 # mobile speed unit km/h
 mobilesample1 <- mobile_data[[1]]
@@ -51,7 +51,7 @@ plot(sample1$timestamp, y, type = "l")
 points(sample1$timestamp[start_index:n2],
        x[1:(n2-(start_index-1))], col = "red", type = "l")
 
-# make function
+# make function: method 1
 sync_trip <- function(obd_trip_data, mobile_trip_data){
     # load reference speed
     # sync scale using division of 3.6
@@ -87,26 +87,23 @@ sync_trip <- function(obd_trip_data, mobile_trip_data){
          fitness = result[min_i])
 }
 
-# mobile speed unit km/h
-mobilesample1 <- mobile_data[[9]]
+obd_trip_data <- sample1
+mobile_trip_data <- mobilesample1
 
-# find best OBD2 trip
+# mobile speed unit km/h
+mobilesample1 <- mobile_data[[1]]
+
+# find best OBD2 trip sync_trip
 match_result <- lapply(obd2_data, sync_trip,
                        mobile_trip_data = mobilesample1)
 match_result <- matrix(unlist(match_result), ncol = 3, byrow = TRUE)
 trip_fit <- match_result[,3]
 plot(1:length(trip_fit), trip_fit, type = "l")
-
 match_info <- c(match_result[which.min(trip_fit),],
                 which.min(trip_fit))
-match_result[15,]
 
-# make function 2: visualization
-vis_trip(obd2_data[[match_info[4]]], mobile_data[[9]], match_info)
-# ref_trip_data <- obd2_data[[15]]
-# trip_data <- mobile_data[[10]]
-# start_p <- match_info[1]
-# end_p <- match_info[2]
+# visualization
+vis_trip(obd2_data[[match_info[4]]], mobile_data[[1]], match_info)
 
 vis_trip <- function(ref_trip_data, trip_data, match_info){
     # grab information about the start and end points
@@ -119,6 +116,91 @@ vis_trip <- function(ref_trip_data, trip_data, match_info){
     with(trip_data,
          points(ref_trip_data$timestamp[start_p:end_p],
                 speed[1:(end_p-(start_p-1))],
+                col = "red", type = "l")
+    )
+}
+
+
+# make function: method 2
+sync_trip2 <- function(obd_trip_data, mobile_trip_data){
+    # load reference speed
+    # sync scale using division of 3.6
+    ref_speed <- obd_trip_data$speed / 3.6
+    
+    # load mobile speed vector
+    target_speed <- mobile_trip_data$speed
+    
+    # measure length of the speed vector
+    n_1 <- length(ref_speed)
+    n_2 <- length(target_speed)
+    n_total <- n_1 + n_2
+    
+    # make result vector
+    result <- rep(1000, n_total)
+    start_p_ref <- rep(0, n_total)
+    start_p_tar <- rep(0, n_total)
+    n_overlap_vec <- rep(0, n_total)
+
+    
+    # sliding window from 1st element of reference speed vector
+    # to the last element of reference speed vector.
+    for (k in 1:n_total){
+        ref_sub <- ref_speed[max(k-n_2+1, 1):min(n_1,k)]
+        tar_sub <- target_speed[max(n_2-k+1, 1):(n_2-max(0,k-n_1))]
+
+        # calculating the overlapped length
+        n_overlap <- min(n_1, k) - (max(k-n_2, 1) - 1)
+        
+        # difference measure
+        result[k] <- sqrt(sum((ref_sub - tar_sub)^2)) / n_overlap + (1 / (n_overlap/10))
+        start_p_ref[k] <- max(k-n_2+1, 1)
+        start_p_tar[k] <- max(n_2-k+1, 1)
+        n_overlap_vec[k] <- n_overlap
+    }
+    
+    # find the arg min of i
+    min_i <- which.min(result)
+    
+    # return the result; min i & corresponding n2
+    data.frame(start_index_ref = start_p_ref[min_i],
+         start_index_tar = start_p_tar[min_i],
+         n_overlap = n_overlap_vec[min_i],
+         fitness = result[min_i],
+         k = min_i)
+}
+
+
+
+# mobile speed unit km/h
+mobilesample1 <- mobile_data[[4]]
+
+# find best OBD2 trip using sync_trip2
+match_result <- lapply(obd2_data, sync_trip2,
+                       mobile_trip_data = mobilesample1)
+match_result <- matrix(unlist(match_result), ncol = 5, byrow = TRUE)
+trip_fit <- match_result[,4]
+plot(1:length(trip_fit), trip_fit, type = "l")
+match_info <- c(match_result[which.min(trip_fit),],
+                which.min(trip_fit))
+
+# make function 2: visualization
+vis_trip2(obd2_data[[match_info[6]]], mobilesample1, match_info)
+
+vis_trip2 <- function(ref_trip_data, target_trip_data, match_info){
+    # grab information about the start and end points
+    start_p_ref <- match_info[1]
+    end_p_ref <- start_p_ref + match_info[3] - 1
+    
+    start_p_tar <- match_info[2]
+    end_p_tar <- start_p_tar + match_info[3] - 1
+    k <- match_info[5]
+    # ref trip data, trip_data both have timestamp, speed
+    with(ref_trip_data,
+         plot(timestamp, speed/3.6, type = "l")
+    )
+    with(target_trip_data,
+         points(ref_trip_data$timestamp[start_p_ref:end_p_ref],
+                speed[start_p_tar:end_p_tar],
                 col = "red", type = "l")
     )
 }
