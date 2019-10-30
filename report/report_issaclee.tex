@@ -33,14 +33,16 @@ City, Iowa 52242-1409}
 \leadauthor{Author and Author}
 
 % Keywords are not mandatory, but authors are strongly encouraged to provide them. If provided, please include two to five keywords, separated by the pipe symbol, e.g:
- \keywords{  one |  two |  optional |  keywords |  here  }  
+ 
 
 \begin{abstract}
-This report illustrates how I approaches the project and the decision
-making process for the analysis. The goal of this project is to find a
-best matched trip for given telematics data from either smartphone or
-OBD2 device. The instruction manual will be provided in the later
-chapter. The implemation code follows Google's R code style guide.
+This report illustrates how I approach the project and the decision
+making the process for Root insurance's data analysis project. The goal
+of this project is to find the best-matched OBDII trip data, which
+corresponds to a trip data from a user's smartphone. The data analysis
+process appears in the first chapter, and the instructional manual
+follows in the later chapter. The \texttt{R} code implementations follow
+Google's \texttt{R} code style guide.
 \end{abstract}
 
 \dates{This version was compiled on \today} 
@@ -63,18 +65,90 @@ chapter. The implemation code follows Google's R code style guide.
 
 % If your first paragraph (i.e. with the \dropcap) contains a list environment (quote, quotation, theorem, definition, enumerate, itemize...), the line after the list may have some extra indentation. If this is the case, add \parshape=0 to the end of the list environment.
 
-\acknow{This template package builds upon, and extends, the work of the
-excellent \href{https://cran.r-project.org/package=rticles}{rticles}
-package, and both packages rely on the
-\href{http://www.pnas.org/site/authors/latex.xhtml}{PNAS LaTeX} macros.
-Both these sources are gratefully acknowledged as this work would not
-have been possible without them. Our extensions are under the same
-respective licensing term
-(\href{https://www.gnu.org/licenses/gpl-3.0.en.html}{GPL-3} and
-\href{https://www.latex-project.org/lppl/}{LPPL (\textgreater= 1.3)}).}
 
-\hypertarget{introduction}{%
-\subsection{Introduction}\label{introduction}}
+\hypertarget{data-preparation}{%
+\subsection{Data Preparation}\label{data-preparation}}
+
+There are two telematics data set from independent sensors: GPS in
+smartphone, OBDII. The two data sets are provided as two separate file.
+Here we assume that the two \texttt{json} files are extracted in the
+working directory, which means you have the following two files in the
+working directory:
+
+\begin{quote}
+mobile\_trips.json, obd2\_trips.json
+\end{quote}
+
+\hypertarget{data-load-and-structure}{%
+\subsection{Data load and structure}\label{data-load-and-structure}}
+
+Since the two files are recorded as \texttt{json} format,
+\texttt{jsonlite} package will be used to load the data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(jsonlite)}
+
+\CommentTok{# read mobile trip & obd2 trip}
+\NormalTok{mobile_data <-}\StringTok{ }\KeywordTok{fromJSON}\NormalTok{(}\StringTok{"./mobile_trips.json"}\NormalTok{)}
+\NormalTok{obd2_data <-}\StringTok{ }\KeywordTok{fromJSON}\NormalTok{(}\StringTok{"./obd2_trips.json"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Smartphone data set consisists of 44 trips and OBDII data set consists
+of 41 trips. The colum names of the each data set and the data types are
+as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  OBDII data
+
+  \begin{itemize}
+  \tightlist
+  \item
+    trip\_id (\texttt{char}), timestamp (\texttt{dbl}), speed
+    (\texttt{int})
+  \end{itemize}
+\item
+  Mobile data
+
+  \begin{itemize}
+  \tightlist
+  \item
+    trip\_id (\texttt{char}), created\_at (\texttt{dbl}), timestamp
+    (\texttt{dbl}), speed (\texttt{dbl}), accuracy (\texttt{int})
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{visualization-of-sample-trips}{%
+\subsection{Visualization of sample
+trips}\label{visualization-of-sample-trips}}
+
+Fig \ref{fig:rawplot_obd2} shows the sample speed graph of one of the
+trips from OBDII data. As we can see, the trip was recorded for around
+1,200 seconds and we do not know the unit for the recorded speed. By
+examing the data set littel bit, it can be easily realized that the
+first trip from each sources corresponds to each other as in Fig.
+\ref{fig:rawplot_obd2} and Fig \ref{fig:rawplot_mobile}.
+
+\begin{figure}
+
+{\centering \includegraphics{report_issaclee_files/figure-latex/rawplot_obd2-1} 
+
+}
+
+\caption{A sample of speed graph of OBDII (the 1st trip).}\label{fig:rawplot_obd2}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics{report_issaclee_files/figure-latex/rawplot_mobile-1} 
+
+}
+
+\caption{A sample of speed graph of Smartphone (the 1st trip).}\label{fig:rawplot_mobile}
+\end{figure}
 
 This \emph{pinp is not PNAS} template started when the introduction to
 \href{http://dirk.eddelbuettel.com/code/rcpp.html}{Rcpp} by
@@ -268,7 +342,6 @@ be possible to correct the situation using commands
 \end{equation}
 
 %\showmatmethods
-\showacknow
 
 
 \bibliography{pinp.bib}

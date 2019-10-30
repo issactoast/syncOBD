@@ -22,26 +22,13 @@ doi_footer: "https://cran.r-project.org/package=YourPackage"
 
 # Abstract
 abstract: |
-  This report illustrates how I approaches the project and the decision making process for the analysis. The goal of this project is to find a best matched trip for given telematics data from either smartphone or OBD2 device.
-  The instruction manual will be provided in the later chapter. The implemation code follows Google's R code style guide.
+  This report illustrates how I approach the project and the decision making the process for Root insurance's data analysis project. The goal of this project is to find the best-matched OBDII trip data, which corresponds to a trip data from a user's smartphone. The data analysis process appears in the first chapter, and the instructional manual follows in the later chapter. The `R` code implementations follow Google's `R` code style guide.
 
 # Optional: Acknowledgements
 acknowledgements: |
-  This template package builds upon, and extends, the work of the excellent
-  [rticles](https://cran.r-project.org/package=rticles) package, and both packages rely on the
-  [PNAS LaTeX](http://www.pnas.org/site/authors/latex.xhtml) macros. Both these sources are
-  gratefully acknowledged as this work would not have been possible without them.  Our extensions
-  are under the same respective licensing term
-  ([GPL-3](https://www.gnu.org/licenses/gpl-3.0.en.html) and
-  [LPPL (>= 1.3)](https://www.latex-project.org/lppl/)).
 
 # Optional: One or more keywords
 keywords:
-  - one
-  - two
-  - optional
-  - keywords
-  - here
 
 # Paper size for the document, values of letter and a4
 papersize: letter
@@ -87,7 +74,60 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-## Introduction 
+## Data Preparation 
+
+There are two telematics data set from independent sensors: GPS in smartphone, OBDII. The two data sets are provided as two separate file. Here we assume that the two `json` files are extracted in the working directory, which means you have the following two files in the working directory:
+
+> mobile_trips.json, obd2_trips.json
+
+## Data load and structure
+
+Since the two files are recorded as `json` format, `jsonlite` package will be used to load the data.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(jsonlite)
+# read obd2 trip & mobile trip
+obd2_data <- fromJSON("../obd2_trips.json")
+mobile_data <- fromJSON("../mobile_trips.json")
+```
+
+```{r eval=FALSE}
+library(jsonlite)
+
+# read mobile trip & obd2 trip
+mobile_data <- fromJSON("./mobile_trips.json")
+obd2_data <- fromJSON("./obd2_trips.json")
+```
+
+Smartphone data set consisists of 44 trips and OBDII data set consists of 41 trips. The colum names of the each data set and the data types are as follows:
+
+- OBDII data
+  - trip_id (`char`), timestamp (`dbl`), speed (`int`)
+- Mobile data
+  - trip_id (`char`), created_at (`dbl`), timestamp (`dbl`), speed (`dbl`), accuracy (`int`)
+
+## Visualization of sample trips
+
+Fig \ref{fig:rawplot_obd2} shows the sample speed graph of one of the trips from OBDII data. As we can see, the trip was recorded for around 1,200 seconds and we do not know the unit for the recorded speed. By examing the data set littel bit, it can be easily realized that the first trip from each sources corresponds to each other as in Fig. \ref{fig:rawplot_obd2} and Fig \ref{fig:rawplot_mobile}.
+
+```{r rawplot_obd2, fig.width=3, fig.height=3, cache=TRUE, echo=FALSE, fig.cap="A sample of speed graph of OBDII (the 1st trip)."}
+library(ggplot2)
+obd2_trip_sample1 <- obd2_data[[1]]
+ggplot(obd2_trip_sample1, aes(timestamp, speed)) +
+    geom_line() +
+    labs(x = "Time (sec.)",
+       y = "Speed (unknown)") +
+    theme(legend.position="none")
+```
+
+```{r rawplot_mobile, fig.width=3, fig.height=3, cache=TRUE, echo=FALSE, fig.cap="A sample of speed graph of Smartphone (the 1st trip)."}
+mobile_trip_sample1 <- mobile_data[[1]]
+ggplot(mobile_trip_sample1, aes(timestamp  - timestamp[1], speed)) +
+    geom_line() +
+    labs(x = "Time (sec.)",
+       y = "Speed (unknown)") +
+    theme(legend.position="none")
+```
 
 This *pinp is not PNAS* template started when the introduction to
 [Rcpp](http://dirk.eddelbuettel.com/code/rcpp.html) by \cite{PeerJ:Rcpp} 
