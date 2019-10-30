@@ -120,7 +120,6 @@ vis_trip <- function(ref_trip_data, trip_data, match_info){
     )
 }
 
-
 # make function: method 2
 sync_trip2 <- function(obd_trip_data, mobile_trip_data){
     # load reference speed
