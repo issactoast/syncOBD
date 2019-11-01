@@ -121,6 +121,14 @@ vis_trip <- function(ref_trip_data, trip_data, match_info){
 }
 
 # make function: method 2
+obdsample1 <- obd2_data[[1]]
+mobilesample1 <- mobile_data[[1]]
+
+dissimilarity <- SimilarityMeasure(obdsample1, mobilesample1)
+plot(dissimilarity, ylim = c(0, 2))
+plot(result)
+which.min(result)
+
 sync_trip2 <- function(obd_trip_data, mobile_trip_data){
     # load reference speed
     # sync scale using division of 3.6
@@ -171,7 +179,7 @@ sync_trip2 <- function(obd_trip_data, mobile_trip_data){
 
 
 # mobile speed unit km/h
-mobilesample1 <- mobile_data[[4]]
+mobilesample1 <- mobile_data[[1]]
 
 # find best OBD2 trip using sync_trip2
 match_result <- lapply(obd2_data, sync_trip2,
@@ -182,7 +190,50 @@ plot(1:length(trip_fit), trip_fit, type = "l")
 match_info <- c(match_result[which.min(trip_fit),],
                 which.min(trip_fit))
 
+FindBestTrip <- function(mobile_trip, obd2_data){
+    match_result <- lapply(obd2_data, sync_trip2,
+                           mobile_trip_data = mobile_trip)
+    match_result <- matrix(unlist(match_result),
+                           ncol = 5, byrow = TRUE)
+    trip_fit <- match_result[,4]
+    best_trip <- which.min(trip_fit)
+    list(start_index_ref = match_result[best_trip, 1],
+         start_index_tar = match_result[best_trip, 2],
+         n_overlap = match_result[best_trip, 3],
+         fitness = match_result[best_trip, 4],
+         k = match_result[best_trip, 5],
+         macthed_trip = best_trip)
+}
+
+match_info <- FindBestTrip(mobilesample1, obd2_data)
+
 # make function 2: visualization
+VisTrip <- function(target_trip_data, obd2_data, match_info){
+    
+    ref_trip_data <- obd2_data[[match_info$macthed_trip]]
+    
+    # grab information about the start and end points
+    start_p_ref <- match_info$start_index_ref
+    end_p_ref <- start_p_ref + match_info$n_overlap - 1
+    
+    start_p_tar <- match_info$start_index_tar
+    end_p_tar <- start_p_tar + match_info$n_overlap - 1
+    k <- match_info$k
+    # ref trip data, trip_data both have timestamp, speed
+    with(ref_trip_data,
+         plot(timestamp, speed/3.6, type = "l")
+    )
+    with(target_trip_data,
+         points(ref_trip_data$timestamp[start_p_ref:end_p_ref],
+                speed[start_p_tar:end_p_tar],
+                col = "red", type = "l")
+    )
+}
+
+match_info <- FindBestTrip(mobilesample1, obd2_data)
+VisTrip(mobilesample1, obd2_data, match_info)
+
+
 vis_trip2(obd2_data[[match_info[6]]], mobilesample1, match_info)
 
 vis_trip2 <- function(ref_trip_data, target_trip_data, match_info){
