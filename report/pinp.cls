@@ -706,25 +706,26 @@ THE ABSTRACT\vskip12pt}\let\go\relax\fi
 
 %% Set colors -- now via test and fallback default in template
 %\definecolor{pinpblue}{HTML}{185FAF}  % imagecolorpicker on blue for new R logo
+\definecolor{rootcolor}{RGB}{255, 87, 21} 
 
 % Add colour to the title
-\appto{\titlefont}{\color{pinpblue}}
+\appto{\titlefont}{\color{rootcolor}}
 
 % ...and section headings
 \titleformat{\section}
-  {\large\sffamily\bfseries\color{pinpblue}}
+  {\large\sffamily\bfseries\color{rootcolor}}
   {\thesection.}
   {0.5em}
   {#1}
   []
 \titleformat{name=\section,numberless}
-  {\large\sffamily\bfseries\color{pinpblue}}
+  {\large\sffamily\bfseries\color{rootcolor}}
   {}
   {0em}
   {#1}
   []  
 \titleformat{\subsection}[runin]
-  {\sffamily\bfseries\color{pinpblue}} %\itshape}%
+  {\sffamily\bfseries\color{rootcolor}} %\itshape}%
   {\thesubsection.}
   {0.5em}
   {#1. }

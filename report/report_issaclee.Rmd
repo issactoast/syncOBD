@@ -1,5 +1,5 @@
 ---
-title: Data analysis report - Root Insurance
+title: \textcolor{black}{Data Analysis Report:} Root Insurance Co
 
 # Use letters for affiliations
 author:
@@ -15,14 +15,14 @@ address:
 #date_subtitle: Published in *Journal of Statistical Software*, 2018
 
 # For footer text  TODO(fold into template, allow free form two-authors)
-lead_author_surname: Author and Author
+lead_author_surname: Issac Lee
 
 # Place eg a DOI URL or CRAN Package URL here
-doi_footer: "https://cran.r-project.org/package=YourPackage"
+doi_footer: "https://theissaclee.com"
 
 # Abstract
 abstract: |
-  This report illustrates how I approach the project and the decision making the process for Root insurance's data analysis project. The goal of this project is to find the best-matched OBDII trip data, which corresponds to a trip data from a user's smartphone. The data analysis process appears in the first chapter, and the instructional manual follows in the later chapter. The `R` code implementations follow Google's `R` code style guide.
+  This report illustrates how I approach to the solution and make a decision for Root insurance's data analysis project. The goal of this project is to find the best-matched OBDII trip with a given trip data which is recorded by a customer's smartphone. In the first chapter of this report, we will look at the data structure and the specific pair of the data from each sensor. Using these sample data, we build the model and extend it to the whole data set in the later chapter. Lastly, the instructional manual for the written `R` function will be provided.
 
 # Optional: Acknowledgements
 acknowledgements: |
@@ -61,7 +61,7 @@ bibliography: pinp.bib
 #watermark: true
 
 # Customize footer, eg by referencing the vignette
-footer_contents: "YourPackage Vignette"
+footer_contents: "University of Iowa"
 
 # Produce a pinp document
 output: pinp::pinp
@@ -128,8 +128,8 @@ ggplot(mobile_trip_sample1, aes(timestamp  - timestamp[1], speed)) +
     geom_line() +
     labs(x = "Time (sec.)",
        y = "Speed (unknown)") +
-    theme(legend.position="none")+
-    theme_bw()
+    theme_bw() +
+    theme(legend.position="none")
 ```
 
 ### Determine the conversion factor between speed scale
@@ -156,8 +156,8 @@ ggplot(obd2_trip_sample1, aes(timestamp, speed/3.6)) +
     geom_line(data = mobile_trip_sample1, aes(x = timestamp - timestamp[1]  + 270, y = speed, col = "red")) +
     labs(x = "Time (sec.)",
        y = "Speed (km/h)") +
-    theme(legend.position="none") +
-    theme_bw()
+    theme_bw() +
+    theme(legend.position="none")
 # with(obd2_trip_sample1, plot(timestamp, speed/3.6, type = "l"))
 # with(mobile_trip_sample1, 
 #      points(timestamp - timestamp[1]  + 270,
@@ -169,7 +169,7 @@ ggplot(obd2_trip_sample1, aes(timestamp, speed/3.6)) +
 
 The next step is to automatically determine the lag time given that we have two matched trips. We will use the same sample trips used in the previous section. In Fig. \ref{fig:speedplot}, the exact lag time for smartphone trip data was 270 seconds. To detect the lagging time, we need to consider every possible combination of these two trip by using sliding window algorithm. A nice visualization of this concept can be found at [here](https://en.wikipedia.org/wiki/Convolution#/media/File:Convolution_of_spiky_function_with_box2.gif). We consider the speed graph from OBDII as a fixed function and the speed graph from smartphone as a floating function in the algorithm.
 
-Let $x \in \mathbb{R^+}$ be a real positive vector of size $n_x$ whose elements represent the speeds or a trip from smartphone, while $y \in \mathbb{R^+}$ and $n_y$ represents the speed and the size of the speed vector from OBDII repectively.
+Let $x \in \mathbb{R^{+}}$ be a real positive vector of size $n_x$ whose elements represent the speeds or a trip from smartphone, while $y \in \mathbb{R^{+}}$ and $n_y$ represents the speed and the size of the speed vector from OBDII repectively.
 
 \begin{equation*}
   \begin{aligned}

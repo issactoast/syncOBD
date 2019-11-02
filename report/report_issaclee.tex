@@ -20,7 +20,7 @@
 
 
 
-\title{Data analysis report - Root Insurance}
+\title{\textcolor{black}{Data Analysis Report:} Root Insurance Co}
 
 \author[a]{Issac Lee}
 
@@ -30,28 +30,30 @@ City, Iowa 52242-1409}
 \setcounter{secnumdepth}{0}
 
 % Please give the surname of the lead author for the running footer
-\leadauthor{Author and Author}
+\leadauthor{Issac Lee}
 
 % Keywords are not mandatory, but authors are strongly encouraged to provide them. If provided, please include two to five keywords, separated by the pipe symbol, e.g:
  
 
 \begin{abstract}
-This report illustrates how I approach the project and the decision
-making the process for Root insurance's data analysis project. The goal
-of this project is to find the best-matched OBDII trip data, which
-corresponds to a trip data from a user's smartphone. The data analysis
-process appears in the first chapter, and the instructional manual
-follows in the later chapter. The \texttt{R} code implementations follow
-Google's \texttt{R} code style guide.
+This report illustrates how I approach to the solution and make a
+decision for Root insurance's data analysis project. The goal of this
+project is to find the best-matched OBDII trip with a given trip data
+which is recorded by a customer's smartphone. In the first chapter of
+this report, we will look at the data structure and the specific pair of
+the data from each sensor. Using these sample data, we build the model
+and extend it to the whole data set in the later chapter. Lastly, the
+instructional manual for the written \texttt{R} function will be
+provided.
 \end{abstract}
 
 \dates{This version was compiled on \today} 
 
 % initially we use doi so keep for backwards compatibility
 % new name is doi_footer
-\doifooter{\url{https://cran.r-project.org/package=YourPackage}}
+\doifooter{\url{https://theissaclee.com}}
 
-\pinpfootercontents{YourPackage Vignette}
+\pinpfootercontents{University of Iowa}
 
 \begin{document}
 
@@ -217,10 +219,10 @@ found at
 We consider the speed graph from OBDII as a fixed function and the speed
 graph from smartphone as a floating function in the algorithm.
 
-Let \(x \in \mathbb{R^+}\) be a real positive vector of size \(n_x\)
+Let \(x \in \mathbb{R^{+}}\) be a real positive vector of size \(n_x\)
 whose elements represent the speeds or a trip from smartphone, while
-\(y \in \mathbb{R^+}\) and \(n_y\) represents the speed and the size of
-the speed vector from OBDII repectively.
+\(y \in \mathbb{R^{+}}\) and \(n_y\) represents the speed and the size
+of the speed vector from OBDII repectively.
 
 \begin{equation*}
   \begin{aligned}
