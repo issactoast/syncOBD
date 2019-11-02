@@ -120,7 +120,8 @@ sync_trip2 <- function(obd_trip_data, mobile_trip_data){
         n_overlap <- min(n_1, k) - (max(k-n_2, 1) - 1)
         
         # difference measure
-        result[k] <- sqrt(sum((ref_sub - tar_sub)^2)) / n_overlap + (1 / (n_overlap/10))
+        result[k] <- sqrt(sum((ref_sub - tar_sub)^2)) / n_overlap + (1 / (n_overlap/100))
+        # result[k] <- sqrt(sum((ref_sub - tar_sub)^2)) / n_overlap + n_2 / n_overlap
         start_p_ref[k] <- max(k-n_2+1, 1)
         start_p_tar[k] <- max(n_2-k+1, 1)
         n_overlap_vec[k] <- n_overlap
@@ -149,14 +150,18 @@ VisTrip <- function(target_trip_data, obd2_data, match_info){
     start_p_tar <- match_info$start_index_tar
     end_p_tar <- start_p_tar + match_info$overlap_length - 1
     # k <- match_info$k
-
+    
+    mydata <- data.frame(timestamp = ref_trip_data$timestamp[start_p_ref:end_p_ref],
+                         speed = target_trip_data$speed[start_p_tar:end_p_tar])
+    
     # ref trip data, trip_data both have timestamp, speed
-    with(ref_trip_data,
-         plot(timestamp, speed/3.6, type = "l")
-    )
-    with(target_trip_data,
-         points(ref_trip_data$timestamp[start_p_ref:end_p_ref],
-                speed[start_p_tar:end_p_tar],
-                col = "red", type = "l")
-    )
+    ggplot2::ggplot(data = ref_trip_data, aes(x = timestamp,
+                                              y = speed / 3.6)) +
+        ggplot2::geom_line()+
+        ggplot2::geom_line(data = mydata, aes(timestamp, speed),
+                           col = "red") +
+        ggplot2::labs(x = "Time (sec.)",
+                      y = "Speed (km/h)") +
+        ggplot2::theme(legend.position="none") +
+        ggplot2::theme_bw()
 }

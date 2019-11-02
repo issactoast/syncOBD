@@ -241,7 +241,7 @@ ggplot(data.frame(dissimilarity = unlist(match_result),
   theme_bw()
 ```
 
-## User instruction
+## User manual
 
 ### Load data
 
@@ -260,14 +260,15 @@ obd2_data <- fromJSON("./obd2_trips.json")
 The following code will find the best OBDII trip which matches with `given_trip` mobile trip, and save the information into `match_info`.
 
 ```{r}
+obd2_data[[26]] <- obd2_data[[25]]
 # Select the second trip in the mobile data set
-given_trip <- mobile_data[[2]]
+given_trip <- mobile_data[[40]]
 
 # Find the best trip from OBDII data set
 match_info <- FindBestTrip(given_trip, obd2_data)
 ```
 
-The `match_info` variable has the matched result information. We can see that there are seven information as follows:
+The `match_info` variable has the match information. We can see that there are seven information as follows:
 
 ```{r}
 summary(match_info)

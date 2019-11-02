@@ -359,8 +359,8 @@ matched trip with the first trip in mobile data.
 \caption{Minimum values of dissimilarity for each trips in OBDII data set}\label{fig:dissimilarity}
 \end{figure}
 
-\hypertarget{user-instruction}{%
-\subsection{User instruction}\label{user-instruction}}
+\hypertarget{user-manual}{%
+\subsection{User manual}\label{user-manual}}
 
 \hypertarget{load-data}{%
 \subsubsection{Load data}\label{load-data}}
@@ -388,16 +388,17 @@ The following code will find the best OBDII trip which matches with
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{obd2_data[[}\DecValTok{26}\NormalTok{]] <-}\StringTok{ }\NormalTok{obd2_data[[}\DecValTok{25}\NormalTok{]]}
 \CommentTok{# Select the second trip in the mobile data set}
-\NormalTok{given_trip <-}\StringTok{ }\NormalTok{mobile_data[[}\DecValTok{2}\NormalTok{]]}
+\NormalTok{given_trip <-}\StringTok{ }\NormalTok{mobile_data[[}\DecValTok{40}\NormalTok{]]}
 
 \CommentTok{# Find the best trip from OBDII data set}
 \NormalTok{match_info <-}\StringTok{ }\KeywordTok{FindBestTrip}\NormalTok{(given_trip, obd2_data)}
 \end{Highlighting}
 \end{Shaded}
 
-The \texttt{match\_info} variable has the matched result information. We
-can see that there are seven information as follows:
+The \texttt{match\_info} variable has the match information. We can see
+that there are seven information as follows:
 
 \begin{Shaded}
 \begin{Highlighting}[]
