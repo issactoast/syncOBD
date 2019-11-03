@@ -36,15 +36,15 @@ City, Iowa 52242-1409}
  
 
 \begin{abstract}
-This report illustrates how I approach to the solution and make a
-decision for Root insurance's data analysis project. The goal of this
-project is to find the best-matched OBDII trip with a given trip data
-which is recorded by a customer's smartphone. In the first chapter of
-this report, we will look at the data structure and the specific pair of
-the data from each sensor. Using these sample data, we build the model
-and extend it to the whole data set in the later chapter. Lastly, the
-instructional manual for the written \texttt{R} function will be
-provided.
+This report illustrates how I approach the solution and make a decision
+for Root insurance's data analysis project. The goal of this project is
+to find the best-matched OBDII trip with a given trip data, which is
+recorded by a customer's smartphone. In the first chapter, we learn how
+to load the data set into the system. Next, we pick one sample trip from
+each sensor and explore the data structure. Using these sample data, we
+build a model and extend it to the whole data set in the later chapter.
+Lastly, we illustrate the instructional manual for the written
+\texttt{R} functions in the \texttt{Rootinsuarnce} package.
 \end{abstract}
 
 \dates{This version was compiled on \today} 
@@ -71,9 +71,9 @@ provided.
 \hypertarget{data-preparation}{%
 \subsection{Data Preparation}\label{data-preparation}}
 
-There are two telematics data set from independent sensors: GPS in
-smartphone, OBDII. The two data sets are provided as two separate file.
-Here we assume that the two \texttt{json} files are extracted in the
+There are two telematics data set from independent sensors: GPS in a
+smartphone, OBDII. The two data sets are stored in two separate files.
+Here we assume that the two \texttt{JSON} files are extracted in the
 working directory, which means you have the following two files in the
 working directory:
 
@@ -84,8 +84,8 @@ mobile\_trips.json, obd2\_trips.json
 \hypertarget{data-load-and-structure}{%
 \subsection{Data load and structure}\label{data-load-and-structure}}
 
-Since the two files are recorded as \texttt{json} format,
-\texttt{jsonlite} package will be used to load the data.
+Since the two files use the \texttt{JSON} format, we use the
+\texttt{jsonlite} package to load the data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -97,9 +97,9 @@ Since the two files are recorded as \texttt{json} format,
 \end{Highlighting}
 \end{Shaded}
 
-Smartphone data set consisists of 44 trips and OBDII data set consists
-of 41 trips. The colum names of the each data set and the data types are
-as follows:
+The smartphone data set consists of 44 trips, and the OBDII data set
+consists of 41 trips. The column names of each data set and the data
+types are as follows:
 
 \begin{itemize}
 \tightlist
@@ -123,20 +123,22 @@ as follows:
   \end{itemize}
 \end{itemize}
 
+Among these columns, we use only \texttt{timestamp} and \texttt{speed}
+columns for the detecting algorithm.
+
 \hypertarget{visualization-of-sample-trips}{%
 \subsection{Visualization of sample
 trips}\label{visualization-of-sample-trips}}
 
 Fig \ref{fig:rawplot_obd2} shows the speed graph of a sample trip from
-OBDII data. As we can see, the OBDII trip was recorded for about 1,200
-seconds and we do not know the unit for the recorded speed. Fig
+OBDII data. As we can see, the OBDII recorded the trip for about 1,200
+seconds, and we do not know the unit of the vehicle speed. Fig
 \ref{fig:rawplot_mobile} shows the speed graph of a sample trip from
-mobile data. Note that the scale of x-axis has been adjusted as zero. By
-examing the data set littel bit, it can be easily realized that the
-first trip from each sources corresponds to each other as in Fig.
-\ref{fig:rawplot_obd2} and Fig \ref{fig:rawplot_mobile}. As we can see
-the whole trip data from smartphone corresponds to the trip data from
-OBDII around 300 seconds.
+mobile data. Note that the scale of the x-axis has been adjusted to
+zero. By examing the data set, we can realize that the first trip from
+each source corresponds to each other, as in Fig. \ref{fig:rawplot_obd2}
+and Fig \ref{fig:rawplot_mobile}. The whole trip data from the
+smartphone corresponds to the trip data from OBDII around 300 seconds.
 
 \begin{figure}
 
@@ -156,14 +158,14 @@ OBDII around 300 seconds.
 \caption{A sample of speed graph of Smartphone (the 1st trip).}\label{fig:rawplot_mobile}
 \end{figure}
 
-\hypertarget{determine-the-conversion-factor-between-speed-scale}{%
+\hypertarget{determine-the-conversion-factor-between-speed-scales}{%
 \subsubsection{Determine the conversion factor between speed
-scale}\label{determine-the-conversion-factor-between-speed-scale}}
+scales}\label{determine-the-conversion-factor-between-speed-scales}}
 
 Using this knowledge we found, we can figure out there is a conversion
-factor between the two different speed scale from each sources. If
-thoese sensor recorded the same trip, thier maximum speed should be the
-same. Thus, we can calculate the conversion factor as follows:
+factor between the two different speed scale from each source. If these
+sensors recorded the same trip, their maximum speed of the trip should
+be the same. Thus, we can calculate the conversion factor as follows:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -179,10 +181,10 @@ same. Thus, we can calculate the conversion factor as follows:
 \end{verbatim}
 \end{ShadedResult}
 
-We can see that it is around 3.6. There are many units for speed such as
-miles per hour (mph), kilometers per hour (km/h), etc. Using the cue
+We can see that it is around 3.6. There are many units for speed, such
+as miles per hour (mph), kilometers per hour (km/h), etc. Using the cue
 that the smartphone sensor should use either \texttt{mph} or
-\texttt{km/h}, we can easily guess that the OBDII uses \texttt{m/s}
+\texttt{km/h,} we can easily guess that the OBDII uses \texttt{m/s}
 since the relationship between \texttt{km/h} and \texttt{m/s} is as
 follows:
 
@@ -190,10 +192,11 @@ follows:
 1 \ m/s = 3.6 \ km/h
 \]
 
-Thus, using conversion factor and the lagging time (300 sec.), we can
-guess our final output should be similar to Fig \ref{fig:speedplot}.
-From now on, we will use \texttt{km/h} as a speed scale since the result
-plot re-confirms that the unit of each sensors.
+Thus, using the conversion factor and the lagging time (about 300 sec.),
+we can guess our final output should be similar to Fig
+\ref{fig:speedplot}. From now on, we use \texttt{km/h} as a speed scale
+since the resulting plot re-confirms that the conversion factor is
+right.
 
 \begin{figure}
 
@@ -204,25 +207,26 @@ plot re-confirms that the unit of each sensors.
 \caption{A sample output of matched speed graph.}\label{fig:speedplot}
 \end{figure}
 
-\hypertarget{lagging-time-detection-algorithm}{%
-\subsection{Lagging time detection
-algorithm}\label{lagging-time-detection-algorithm}}
+\hypertarget{the-detection-algorithm-of-the-lagging-time}{%
+\subsection{The detection algorithm of the lagging
+time}\label{the-detection-algorithm-of-the-lagging-time}}
 
 The next step is to automatically determine the lag time given that we
-have two matched trips. We will use the same sample trips used in the
+have two matched trips. We use the same sample trips used in the
 previous section. In Fig. \ref{fig:speedplot}, the exact lag time for
 smartphone trip data was 270 seconds. To detect the lagging time, we
-need to consider every possible combination of these two trip by using
-sliding window algorithm. A nice visualization of this concept can be
-found at
-\href{https://en.wikipedia.org/wiki/Convolution\#/media/File:Convolution_of_spiky_function_with_box2.gif}{here}.
-We consider the speed graph from OBDII as a fixed function and the speed
-graph from smartphone as a floating function in the algorithm.
+need to consider every possible combination of these two trips by using
+the sliding window algorithm.
+\href{https://en.wikipedia.org/wiki/Convolution\#/media/File:Convolution_of_spiky_function_with_box2.gif}{This
+Wikipedia web page} has an excellent visualization of the concept of the
+algorithm. We consider the speed graph from OBDII as a fixed function
+and the speed graph from a smartphone as a floating function in the
+algorithm.
 
 Let \(x \in \mathbb{R^{+}}\) be a real positive vector of size \(n_x\)
-whose elements represent the speeds or a trip from smartphone, while
+whose elements represent the speeds or a trip from a smartphone, while
 \(y \in \mathbb{R^{+}}\) and \(n_y\) represents the speed and the size
-of the speed vector from OBDII repectively.
+of the speed vector from OBDII respectively.
 
 \begin{equation*}
   \begin{aligned}
@@ -290,10 +294,10 @@ three cases:
 similarity}\label{measure-for-the-similarity}}
 
 There are many measures for the similarity of the two functions whose
-domains are the same: area under the difference of the two functions,
-maximum difference of the two functions values, etc. Among these, the
-following measure is used for detecting the similarity between the two
-speed vectors:
+domains are the same: area under the difference between the two
+functions, the maximum difference of the two functions, etc. Among
+these, we use the following measure for detecting the similarity between
+the two-speed graphs:
 
 \begin{equation}
   \begin{aligned}
@@ -304,21 +308,22 @@ speed vectors:
 from smartphone and OBDII, and the set \(A\) is the collection of the
 pair of coordinates of OBDII and smartphone speed vectors overlapped
 each other for fixed \(k\). Note that the function \(|.|\) indicates the
-caldinality of a set. The reason of the division in Equation
+cardinality of a set. The reason for the division in Equation
 \ref{eqn:sumofsquare} is to calculate the average of the errors.
 
-Also, the second term can be thought as a penalty function that prevents
-the case where the length of the overlapped is too short, so the
-dissimilarity is too small. We can put the weights on the panalty using
-\(\lambda\), and we uses 10 for \(\lambda\) value for this case. Since
-the value of \(f(x, y)\) decreases when the two vector \(x\) and \(y\)
-are similar to each other, the interpretation of the measure should be
-dissimilarity of the two vector. Fig. \ref{fig:laggedtime} shows the
-dissimilarity with respect to the \(k\) from 1 to 2354, which is the
-summation of the length of speed vector from OBDII and smartphone. The
-index which makes the dissimilarity to be the smallest value is
-\(k = 1374\). According to Equation \ref{eqn:slidingwindow}, this
-corresponds to the 255th time stamp of the OBDII trip.
+Also, the penalty function, the second term in Equation
+\ref{eqn:sumofsquare}, prevents the case where the dissimilarity of a
+vector is so small since the length of the overlapped is too short. We
+can put the weights on the penalty using \(\lambda\), and we use 10 for
+\(\lambda\) value for this project. Since the value of \(f(x, y)\)
+decreases when the two vectors, \(x\) and \(y\), are similar to each
+other, the interpretation of the measure should be dissimilarity of the
+two vectors. Fig. \ref{fig:laggedtime} shows the dissimilarity
+concerning the \(k\) from 1 to 2354, which is the summation of the
+length of the speed vectors. The index, which makes the dissimilarity to
+be the smallest value, is \(k = 1374\). According to Equation
+\ref{eqn:slidingwindow}, this corresponds to the 255th timestamp of the
+OBDII trip.
 
 \begin{figure}
 
@@ -326,29 +331,29 @@ corresponds to the 255th time stamp of the OBDII trip.
 
 }
 
-\caption{Dissimilarity measure for w.r.t. $k$}\label{fig:laggedtime}
+\caption{Dissimilarity measure for with respect to $k$. First trips from OBDII and smartphone.}\label{fig:laggedtime}
 \end{figure}
 
 \hypertarget{find-the-best-matched-trips}{%
-\subsection{Find the best matched
+\subsection{Find the best-matched
 trips}\label{find-the-best-matched-trips}}
 
 In the previous section, we have discussed how to find the lagging time
-using dissimilarity measure. To find a best matched trip among the
-collection of the OBDII trips for a given smartphone trip, we can find
-the OBDII trip whose minimum of the dissmilarity with the given
-smartphone trip is the lowest among the whole collection of the OBDII
-data set. However, since we cannnot guarantee that the lowest minimum of
-the dissmilarity implies that the two trip from each sources actually
-matched each other, we set \(0.1\) as a threshold. Thus, if the lowest
-minimum dissimilarity is less than 0.1, we decide that the pair of OBDII
-trip and smartphone trip are matched each other. Fig.
+using dissimilarity measure. To find a best-matched OBDII trip for a
+given smartphone trip, we find the OBDII trip whose minimum of the
+dissimilarity with the given smartphone trip is the lowest among the
+whole collection of OBDII trips in the data set. However, since we can
+not guarantee that the lowest minimum of the dissimilarity implies that
+the two trips matched each other, we set \(0.1\) as a threshold. Thus,
+if the lowest minimum dissimilarity is less than 0.1, we conclude that
+the pair of OBDII and smartphone trips matched with each other. Fig.
 \ref{fig:dissimilarity} represents the minimum of dissimilarity for each
-trips in OBDII data with the first trip in mobile data set. The dotted
-line, in Fig. \ref{fig:dissimilarity}, indicates the threshold for
-matched trip. Since the minimum of the dissimilarity of the first trip
-is less than the 0.1, we choose the first trip in OBDII data as the best
-matched trip with the first trip in mobile data.
+trip in OBDII data with the first trip in the mobile data set. The
+dotted line, in Fig. \ref{fig:dissimilarity}, indicates the threshold
+for the matched trip. Since the dissimilarity of the first trip is
+lowest among OBDII trips and it is less than 0.1, we select that the
+first trip in OBDII data as the best-matched trip with the first trip in
+mobile data.
 
 \begin{figure}
 
@@ -362,43 +367,64 @@ matched trip with the first trip in mobile data.
 \hypertarget{user-manual}{%
 \subsection{User manual}\label{user-manual}}
 
-\hypertarget{load-data}{%
-\subsubsection{Load data}\label{load-data}}
+\hypertarget{installation}{%
+\subsubsection{Installation}\label{installation}}
 
-You can load the JSON file into \texttt{R} using \texttt{jsonlite}
-package as at the biginning of this document.
+To install the \texttt{RootInsuarnce} package, save the
+\texttt{RootInsurance\_0.1.0.tar.gz} file into your \texttt{R} working
+directory, then run the following code.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(jsonlite)}
-
-\CommentTok{# read mobile trip & obd2 trip}
-\NormalTok{mobile_data <-}\StringTok{ }\KeywordTok{fromJSON}\NormalTok{(}\StringTok{"./mobile_trips.json"}\NormalTok{)}
-\NormalTok{obd2_data <-}\StringTok{ }\KeywordTok{fromJSON}\NormalTok{(}\StringTok{"./obd2_trips.json"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"./RootInsurance_0.1.0.tar.gz"}\NormalTok{,}
+                 \DataTypeTok{repos =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{type =} \StringTok{"source"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{find-the-best-obdii-trip-for-given-smartphone-trip}{%
-\subsubsection{Find the best OBDII trip for given smartphone
-trip}\label{find-the-best-obdii-trip-for-given-smartphone-trip}}
-
-The following code will find the best OBDII trip which matches with
-\texttt{given\_trip} mobile trip, and save the information into
-\texttt{match\_info}.
+After the installation, you can load the package as follows:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{obd2_data[[}\DecValTok{26}\NormalTok{]] <-}\StringTok{ }\NormalTok{obd2_data[[}\DecValTok{25}\NormalTok{]]}
+\KeywordTok{library}\NormalTok{(RootInsurance)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{load-telematics-data}{%
+\subsubsection{Load telematics data}\label{load-telematics-data}}
+
+Put your telematics file (JSON file format) in the working directory.
+\texttt{LoadTelematics} function uses \texttt{jsonlite} package to load
+the telematics trip using a list format in \texttt{R} as at the
+beginning of this document.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# read mobile trip & obd2 trip}
+\NormalTok{mobile_data <-}\StringTok{ }\KeywordTok{LoadTelematics}\NormalTok{(}\StringTok{"yourfile.json"}\NormalTok{)}
+\NormalTok{obd2_data <-}\StringTok{ }\KeywordTok{LoadTelematics}\NormalTok{(}\StringTok{"yourfile.json"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{find-the-best-obdii-trip-for-a-given-smartphone-trip}{%
+\subsubsection{Find the best OBDII trip for a given smartphone
+trip}\label{find-the-best-obdii-trip-for-a-given-smartphone-trip}}
+
+The following \texttt{R} code selects the first smartphone trip in the
+mobile data set as a target trip. Next, it finds the best-matched OBDII
+trip using the \texttt{FindBestTrip} function and saves the result into
+the \texttt{match\_info} variable.
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# Select the second trip in the mobile data set}
-\NormalTok{given_trip <-}\StringTok{ }\NormalTok{mobile_data[[}\DecValTok{40}\NormalTok{]]}
+\NormalTok{seleted_trip <-}\StringTok{ }\NormalTok{mobile_data[[}\DecValTok{1}\NormalTok{]]}
 
 \CommentTok{# Find the best trip from OBDII data set}
-\NormalTok{match_info <-}\StringTok{ }\KeywordTok{FindBestTrip}\NormalTok{(given_trip, obd2_data)}
+\NormalTok{match_info <-}\StringTok{ }\KeywordTok{FindBestTrip}\NormalTok{(seleted_trip, obd2_data)}
 \end{Highlighting}
 \end{Shaded}
 
-The \texttt{match\_info} variable has the match information. We can see
-that there are seven information as follows:
+The \texttt{match\_info} variable has the following seven information:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -417,14 +443,39 @@ that there are seven information as follows:
 \end{verbatim}
 \end{ShadedResult}
 
+\hypertarget{visualization-of-the-matching-info.}{%
+\subsubsection{Visualization of the matching
+info.}\label{visualization-of-the-matching-info.}}
+
+Once we find the best matching trip, you can visualize it using
+\texttt{VisTrip} function as follows:
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Visualization}
-\KeywordTok{VisTrip}\NormalTok{(given_trip, obd2_data, match_info)}
+\KeywordTok{VisTrip}\NormalTok{(seleted_trip, obd2_data, match_info)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{center}\includegraphics{report_issaclee_files/figure-latex/unnamed-chunk-7-1} \end{center}
+\begin{center}\includegraphics{report_issaclee_files/figure-latex/sampleresult-1} \end{center}
+
+Note that if there is no best matching OBDII trip, this function shows a
+possible candidate OBDII trip with a warning title.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Select the second trip in the mobile data set}
+\NormalTok{seleted_trip <-}\StringTok{ }\NormalTok{mobile_data[[}\DecValTok{40}\NormalTok{]]}
+
+\CommentTok{# Find the best trip from OBDII data set}
+\NormalTok{match_info <-}\StringTok{ }\KeywordTok{FindBestTrip}\NormalTok{(seleted_trip, obd2_data)}
+
+\CommentTok{# Visualization}
+\KeywordTok{VisTrip}\NormalTok{(seleted_trip, obd2_data, match_info)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics{report_issaclee_files/figure-latex/unnamed-chunk-9-1} \end{center}
 
 %\showmatmethods
 
