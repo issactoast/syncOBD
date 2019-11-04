@@ -301,7 +301,7 @@ Note that if there is no best matching OBDII trip, this function shows a possibl
 
 ```{r}
 # Select the second trip in the mobile data set
-seleted_trip <- mobile_data[[40]]
+seleted_trip <- mobile_data[[39]]
 
 # Find the best trip from OBDII data set
 match_info <- FindBestTrip(seleted_trip, obd2_data)
