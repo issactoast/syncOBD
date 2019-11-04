@@ -266,8 +266,15 @@ Put your telematics file (JSON file format) in the working directory. `LoadTelem
 
 ```{r eval=FALSE}
 # read mobile trip & obd2 trip
-mobile_data <- LoadTelematics("yourfile.json")
-obd2_data <- LoadTelematics("yourfile.json")
+mobile_data <- LoadTelematics("mobile_trips.json")
+obd2_data <- LoadTelematics("obd2_trips.json")
+```
+
+If you are working with `json.gz` files, put them in the working directory, but you need to load gz file first using the `gzfile` function. After that, you can use the `LoadTelematics` function.
+
+```{r eval=FALSE}
+mobile_json <- gzfile("mobile_trips.json.gz")
+mobile_data <- LoadTelematics(mobile_json)
 ```
 
 ### Find the best OBDII trip for a given smartphone trip

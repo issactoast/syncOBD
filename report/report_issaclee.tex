@@ -400,8 +400,19 @@ beginning of this document.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# read mobile trip & obd2 trip}
-\NormalTok{mobile_data <-}\StringTok{ }\KeywordTok{LoadTelematics}\NormalTok{(}\StringTok{"yourfile.json"}\NormalTok{)}
-\NormalTok{obd2_data <-}\StringTok{ }\KeywordTok{LoadTelematics}\NormalTok{(}\StringTok{"yourfile.json"}\NormalTok{)}
+\NormalTok{mobile_data <-}\StringTok{ }\KeywordTok{LoadTelematics}\NormalTok{(}\StringTok{"mobile_trips.json"}\NormalTok{)}
+\NormalTok{obd2_data <-}\StringTok{ }\KeywordTok{LoadTelematics}\NormalTok{(}\StringTok{"obd2_trips.json"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+If you are working with \texttt{json.gz} files, put them in the working
+directory, but you need to load gz file first using the \texttt{gzfile}
+function. After that, you can use the \texttt{LoadTelematics} function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mobile_json <-}\StringTok{ }\KeywordTok{gzfile}\NormalTok{(}\StringTok{"mobile_trips.json.gz"}\NormalTok{)}
+\NormalTok{mobile_data <-}\StringTok{ }\KeywordTok{LoadTelematics}\NormalTok{(mobile_json)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -475,7 +486,7 @@ possible candidate OBDII trip with a warning title.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{center}\includegraphics{report_issaclee_files/figure-latex/unnamed-chunk-9-1} \end{center}
+\begin{center}\includegraphics{report_issaclee_files/figure-latex/unnamed-chunk-10-1} \end{center}
 
 %\showmatmethods
 
