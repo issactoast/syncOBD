@@ -299,9 +299,9 @@ VisTrip(seleted_trip, obd2_data, match_info)
 
 Note that if there is no best matching OBDII trip, this function shows a possible candidate OBDII trip with a warning title.
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 # Select the second trip in the mobile data set
-seleted_trip <- mobile_data[[39]]
+seleted_trip <- mobile_data[[40]]
 
 # Find the best trip from OBDII data set
 match_info <- FindBestTrip(seleted_trip, obd2_data)

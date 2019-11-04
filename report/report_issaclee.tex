@@ -420,8 +420,7 @@ the \texttt{match\_info} variable.
 \NormalTok{seleted_trip <-}\StringTok{ }\NormalTok{mobile_data[[}\DecValTok{1}\NormalTok{]]}
 
 \CommentTok{# Find the best trip from OBDII data set}
-\NormalTok{match_info <-}\StringTok{ }\KeywordTok{FindBestTrip}\NormalTok{(seleted_trip, obd2_data,}
-                           \DataTypeTok{weight =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{match_info <-}\StringTok{ }\KeywordTok{FindBestTrip}\NormalTok{(seleted_trip, obd2_data)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -441,31 +440,6 @@ The \texttt{match\_info} variable has the following seven information:
 #  overlap_length  1      -none- numeric
 #  dissimilarity   1      -none- numeric
 #  macthed_trip    1      -none- numeric
-\end{verbatim}
-\end{ShadedResult}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{match_info}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{ShadedResult}
-\begin{verbatim}
-#  $start_index_ref
-#  [1] 256
-#  
-#  $start_index_tar
-#  [1] 1
-#  
-#  $overlap_length
-#  [1] 981
-#  
-#  $dissimilarity
-#  [1] 0.07642238
-#  
-#  $macthed_trip
-#  [1] 1
 \end{verbatim}
 \end{ShadedResult}
 
@@ -491,7 +465,7 @@ possible candidate OBDII trip with a warning title.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Select the second trip in the mobile data set}
-\NormalTok{seleted_trip <-}\StringTok{ }\NormalTok{mobile_data[[}\DecValTok{39}\NormalTok{]]}
+\NormalTok{seleted_trip <-}\StringTok{ }\NormalTok{mobile_data[[}\DecValTok{40}\NormalTok{]]}
 
 \CommentTok{# Find the best trip from OBDII data set}
 \NormalTok{match_info <-}\StringTok{ }\KeywordTok{FindBestTrip}\NormalTok{(seleted_trip, obd2_data)}
